@@ -1,74 +1,62 @@
-#include <enet/enet.h>
+#include "utilities/Time.h"
+#include "utilities/Input.h"
+#include "utilities/Window.h"
+#include "scenes/MainScene.h"
+
+#pragma warning(push, 0)
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include <iostream>
-#include <cstdlib>
-#include <cstring>
+#include <fstream>
+#pragma warning(pop)
 
-int main(int argc, char** argv) {
-    uint16_t port = 7777;
-    if (argc > 1) {
-        port = static_cast<uint16_t>(std::atoi(argv[1]));
-    }
+// Global objects
+Time g_Time;
+Input g_Input;
+Window g_Window;
 
-    if (enet_initialize() != 0) {
-        std::cerr << "An error occurred while initializing ENet.\n";
+int main() {
+    // Initialize OpenGL
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    
+    // Create window
+    g_Window.Initialize(1920, 1080, "Rubik's cube");
+    if (!g_Window) {
+        glfwTerminate();
+        std::cout << "Failed to create GLFW window\n";
         return EXIT_FAILURE;
     }
-    atexit(enet_deinitialize);
-
-    ENetAddress address;
-    ENetHost* server;
-
-    address.host = ENET_HOST_ANY;
-    address.port = port;
-
-    server = enet_host_create(&address, 32, 2, 0, 0);
-    if (!server) {
-        std::cerr << "An error occurred while trying to create an ENet server host.\n";
+    glfwMakeContextCurrent(g_Window);
+    
+    // Load glad
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD\n";
         return EXIT_FAILURE;
     }
-
-    std::cout << "Server initialized on port " << port << ".\n";
-
-    ENetEvent event;
-    while (true) {
-        while (enet_host_service(server, &event, 1000) > 0) {
-            switch (event.type) {
-                case ENET_EVENT_TYPE_CONNECT:
-                    std::cout << "A new client connected from "
-                              << event.peer->address.host << ":"
-                              << event.peer->address.port << ".\n";
-                    event.peer->data = (void*)"Client information";
-                    break;
-                case ENET_EVENT_TYPE_RECEIVE:
-                    std::cout << "A packet of length " << event.packet->dataLength
-                              << " containing " << (char*)event.packet->data
-                              << " was received from " << (char*)event.peer->data
-                              << " on channel " << event.channelID << ".\n";
-                    enet_packet_destroy(event.packet);
-                    break;
-                case ENET_EVENT_TYPE_DISCONNECT:
-                    std::cout << (char*)event.peer->data << " disconnected.\n";
-                    event.peer->data = nullptr;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // Send data to all connected peers at the end of the service loop
-        const char* message = "Server message at the end of the service loop";
-        ENetPacket* packet = enet_packet_create(message, strlen(message) + 1, ENET_PACKET_FLAG_RELIABLE);
-
-        for (size_t i = 0; i < server->peerCount; ++i) {
-            ENetPeer* peer = &server->peers[i];
-            if (peer->state == ENET_PEER_STATE_CONNECTED) {
-                enet_peer_send(peer, 0, packet);
-            }
-        }
-
-        enet_host_flush(server);
-    }
-
-    enet_host_destroy(server);
+    
+    // Set callbacks
+    glfwSetFramebufferSizeCallback(g_Window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(g_Window, mouse_callback);
+    glfwSetScrollCallback(g_Window, scroll_callback);
+    
+    // Main scene
+    MainScene main_scene;
+    main_scene.PreRun();
+    main_scene.CreateScene();
+    // calling run starts the game loop
+    main_scene.Run();
+    main_scene.PostRun();
+    
+    // End of application
+    glfwSetWindowShouldClose(g_Window, true);
+    glfwTerminate();
     return EXIT_SUCCESS;
 }
