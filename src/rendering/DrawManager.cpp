@@ -120,7 +120,7 @@ std::array<float, 16> flatten_4x4(glm::mat4 input) {
 
 void DrawManager::CallDrawsOverNetwork(ENetHost* server) const {
 
-    std::vector<std::array<float, 16>> local_to_world_matrices;
+    std::array<std::array<float, 16>, 27> local_to_world_matrices;
 
     glm::vec3 camera_position = m_Camera->Object().Root().Position();
 
@@ -136,19 +136,19 @@ void DrawManager::CallDrawsOverNetwork(ENetHost* server) const {
     glm::mat4 camera_view_matrix = m_Camera->ViewMatrix();
     std::array<float, 16> camera_view_fixed_size_flattened = flatten_4x4(camera_view_matrix);
 
-
+    int i = 0;
     for (const auto& drawable : m_Drawables) {
         if (auto cubie = dynamic_cast<Cubie*>(drawable)) {
             glm::mat4 model_matrix_for_drawable =  cubie->GetModelMatrixToDrawCubie();
-            local_to_world_matrices.push_back(flatten_4x4(model_matrix_for_drawable));
+            local_to_world_matrices[i] = flatten_4x4(model_matrix_for_drawable);
+            i++;
         }  // else don't care
     }
 
     DrawingSnapshot drawing_snapshot = {camera_pos_flattened_fixed_size, camera_view_fixed_size_flattened, camera_proj_fixed_size_flattened, local_to_world_matrices};
 
     // Send data to all connected peers at the end of the service loop
-    const char* message = "Server message at the end of the service loop";
-    ENetPacket* packet = enet_packet_create(message, strlen(message) + 1, ENET_PACKET_FLAG_RELIABLE);
+    ENetPacket* packet = enet_packet_create(&drawing_snapshot, sizeof(DrawingSnapshot), 0);
 
     for (size_t i = 0; i < server->peerCount; ++i) {
         ENetPeer* peer = &server->peers[i];

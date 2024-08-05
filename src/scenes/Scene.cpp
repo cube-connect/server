@@ -116,7 +116,8 @@ void MyScene::RunOverNetwork() {
 
         // Managers
         m_ObjectManager.ProcessFrame();
-        m_DrawManager.CallDraws();
+        m_DrawManager.CallDrawsOverNetwork(server);
+        // m_DrawManager.CallDraws();
     }
 }
 
