@@ -46,15 +46,22 @@ int main() {
     glfwSetFramebufferSizeCallback(g_Window, framebuffer_size_callback);
     glfwSetCursorPosCallback(g_Window, mouse_callback);
     glfwSetScrollCallback(g_Window, scroll_callback);
-    
+
+    bool running_over_network = true;
+
     // Main scene
     MainScene main_scene;
     main_scene.PreRun();
     main_scene.CreateScene();
     // calling run starts the game loop
-    main_scene.Run();
+    if (running_over_network) {
+        main_scene.RunOverNetwork();
+    } else {
+        main_scene.Run();
+
+    }
     main_scene.PostRun();
-    
+
     // End of application
     glfwSetWindowShouldClose(g_Window, true);
     glfwTerminate();

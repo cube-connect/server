@@ -17,6 +17,7 @@
 #include <array>
 #include <assert.h>
 #include <memory>
+#include <enet/enet.h>
 
 
 class Camera;
@@ -46,6 +47,7 @@ public:
     void UnregisterLightSource(ILightSource* light_source);
 
     void CallDraws() const;
+    void CallDrawsOverNetwork(ENetHost* server) const;
 
 private:
     glm::vec3 m_Background{ 0.0f };

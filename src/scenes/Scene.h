@@ -20,6 +20,7 @@ public:
 
     void PreRun();
     void Run();
+    void RunOverNetwork();
     void PostRun();
 
     void Exit();

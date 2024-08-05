@@ -14,7 +14,6 @@ public:
 
     virtual void Draw(const ShaderProgram &shader) const = 0;
 
-    virtual glm::mat4 GetModelMatrixToDrawCubie() const = 0;
 
     ShaderProgram::Type ShaderType() const { return m_ShaderType; }
     void ShaderType(ShaderProgram::Type type) { m_ShaderType = type; }

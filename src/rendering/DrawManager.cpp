@@ -11,6 +11,7 @@
 #include "../cbs/components/Camera.h"
 
 #include "../networking/client_server_shared/drawing_snapshot.hpp"
+#include "cbs/components/RubiksCube/Cubie.h"
 
 void DrawManager::Initialize() {
     // Dear imgui initialiation
@@ -135,10 +136,12 @@ void DrawManager::CallDrawsOverNetwork(ENetHost* server) const {
     glm::mat4 camera_view_matrix = m_Camera->ViewMatrix();
     std::array<float, 16> camera_view_fixed_size_flattened = flatten_4x4(camera_view_matrix);
 
-    // Draw objects
-    for (auto to_draw = m_Drawables.cbegin(); to_draw != m_Drawables.cend(); to_draw++) {
-        glm::mat4 model_matrix_for_drawable =  (*to_draw)->GetModelMatrixToDrawCubie();
-        local_to_world_matrices.push_back(flatten_4x4(model_matrix_for_drawable));
+
+    for (const auto& drawable : m_Drawables) {
+        if (auto cubie = dynamic_cast<Cubie*>(drawable)) {
+            glm::mat4 model_matrix_for_drawable =  cubie->GetModelMatrixToDrawCubie();
+            local_to_world_matrices.push_back(flatten_4x4(model_matrix_for_drawable));
+        }  // else don't care
     }
 
     DrawingSnapshot drawing_snapshot = {camera_pos_flattened_fixed_size, camera_view_fixed_size_flattened, camera_proj_fixed_size_flattened, local_to_world_matrices};
