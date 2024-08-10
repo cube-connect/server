@@ -37,6 +37,8 @@ set(SOURCES
 	dependencies/imgui/imgui_impl_opengl3.cpp
 	dependencies/imgui/imgui_impl_glfw.h
 	dependencies/imgui/imgui_impl_glfw.cpp
+
+	networking/user_control.cpp
 )
 
 set(HEADERS
@@ -78,6 +80,8 @@ set(HEADERS
 	utilities/Input.h
 	utilities/Time.h
 	utilities/Window.h
+
+	networking/user_control.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})

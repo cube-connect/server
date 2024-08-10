@@ -75,6 +75,11 @@ void MyScene::RunOverNetwork() {
 
     std::vector<InputSnapshot> input_snapshots_received_this_tick;
 
+    bool just_gained = false;
+    bool just_released = false;
+    int gained_counter = 60;
+    int released_counter = 60;
+
     // Game loop
     while (m_Running && !glfwWindowShouldClose(g_Window)) {
         // If frame rate is greater than limit then wait
@@ -95,6 +100,7 @@ void MyScene::RunOverNetwork() {
                 unsigned client_id = num_clients_that_connected;
                 // Send data to all connected peers at the end of the service loop
                 ENetPacket *client_id_packet = enet_packet_create(&client_id, sizeof(unsigned int), 0);
+                std::cout << "client ID: " << client_id << std::endl;
 
                 //                if (connecting_peer->state == ENET_PEER_STATE_CONNECTED) {
                 enet_peer_send(connecting_peer, 0, client_id_packet);
@@ -102,9 +108,9 @@ void MyScene::RunOverNetwork() {
                 num_clients_that_connected += 1;
             } break;
             case ENET_EVENT_TYPE_RECEIVE:
-                std::cout << "A packet of length " << event.packet->dataLength << " containing "
-                          << (char *)event.packet->data << " was received from " << (char *)event.peer->data
-                          << " on channel " << event.channelID << ".\n";
+                // std::cout << "A packet of length " << event.packet->dataLength << " containing "
+                //           << (char *)event.packet->data << " was received from " << (char *)event.peer->data
+                //           << " on channel " << event.channelID << ".\n";
 
                 if (event.packet->dataLength == sizeof(InputSnapshot)) {
                     auto input_snapshot = *reinterpret_cast<InputSnapshot *>(event.packet->data);
@@ -123,17 +129,38 @@ void MyScene::RunOverNetwork() {
             }
         }
 
-        int wait = 20; // hack
-        for (auto input_snapshot : input_snapshots_received_this_tick) {
-            if (user_control.get_user_in_control() != input_snapshot.client_id) {
-                if (input_snapshot.enter_pressed && input_snapshot.shift_pressed) {
-                    user_control.attempt_to_gain_control(input_snapshot.client_id);
-                }
-            } else {
-                if (wait == 0) {
-                    user_control.release_control();
+        if (just_released) {
+            released_counter -= 1;
+            if (released_counter == 0) {
+                just_released = false;
+                released_counter = 60;
+            }
+        } 
+        
+        if (just_gained) {
+            gained_counter -= 1;
+            if (gained_counter == 0) {
+                just_gained = false;
+                gained_counter = 60;
+            }
+        } 
+        
+        if (!just_gained && !just_released) {
+            for (auto input_snapshot : input_snapshots_received_this_tick) {
+                bool control_matches_id = user_control.get_user_in_control() == input_snapshot.client_id;
+                bool attempting_to_toggle_control = input_snapshot.enter_pressed && input_snapshot.shift_pressed;
+                // std::cout << input_snapshot.enter_pressed << ' ' << input_snapshot.shift_pressed << std::endl;
+                if (!user_control.being_controlled) {
+                    if (attempting_to_toggle_control) {
+                        if (user_control.attempt_to_gain_control(input_snapshot.client_id)) {
+                            just_gained = true;
+                        }
+                    }
                 } else {
-                    wait -= 1;
+                    if (attempting_to_toggle_control && control_matches_id) {
+                        user_control.release_control();
+                        just_released = true;
+                    }
                 }
             }
         }
@@ -141,14 +168,14 @@ void MyScene::RunOverNetwork() {
         // Update global systems
         g_Time.Update();
 
-        int count = 0;
         for (auto &input_snapshot : input_snapshots_received_this_tick) {
-            if (user_control.get_user_in_control() == input_snapshot.client_id) {
+            bool control_matches_id = user_control.get_user_in_control() == input_snapshot.client_id;
+            if (user_control.being_controlled && control_matches_id) {
                 g_Input.NetworkUpdate(input_snapshot); // only do this if you're in charge
-                count += 1;
             }
         }
-        assert(count == 1);
+
+        input_snapshots_received_this_tick.clear();
 
         // Managers
         m_ObjectManager.ProcessFrame();

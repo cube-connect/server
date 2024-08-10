@@ -18,9 +18,10 @@ class UserControl {
     bool is_available_for_user_to_obtain_control() const;
     void release_control();
 
+    bool being_controlled; ///< Flag indicating if control is available for users to obtain.
+
   private:
     unsigned int user_in_control_;              ///< The ID of the user currently in control.
-    bool available_for_user_to_obtain_control_; ///< Flag indicating if control is available for users to obtain.
 };
 
 #endif // USER_CONTROL_HPP
