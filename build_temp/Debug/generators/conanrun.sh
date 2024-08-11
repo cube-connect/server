@@ -1,1 +1,0 @@
-. "/home/ccn/projects/cube-connect-organization/server/build/Debug/generators/conanrunenv-debug-x86_64.sh"
