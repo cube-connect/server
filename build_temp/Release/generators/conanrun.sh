@@ -1,0 +1,1 @@
+. "/home/ccn/projects/cube-connect-organization/server/build/Release/generators/conanrunenv-release-x86_64.sh"

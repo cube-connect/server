@@ -15,28 +15,28 @@ void MyScene::PreRun() {
 }
 
 void MyScene::Run() {
-    m_ObjectManager.InitializeObjects();
-
-    // Initialize Time manager as close to game loop as possible
-    // to avoid misrepresented delta time
-    g_Time.Initialize();
-
-    // Game loop
-    while (m_Running && !glfwWindowShouldClose(g_Window)) {
-        // If frame rate is greater than limit then wait
-        do {
-            g_Time.Hold();
-            glfwPollEvents();
-        } while (g_Time.DeltaTime() < m_FrameRateLimit);
-
-        // Update global systems
-        g_Time.Update();
-        g_Input.Update(g_Window);
-
-        // Managers
-        m_ObjectManager.ProcessFrame();
-        m_DrawManager.CallDraws();
-    }
+    //    m_ObjectManager.InitializeObjects();
+    //
+    //    // Initialize Time manager as close to game loop as possible
+    //    // to avoid misrepresented delta time
+    //    g_Time.Initialize();
+    //
+    //    // Game loop
+    //    while (m_Running && !glfwWindowShouldClose(g_Window)) {
+    //        // If frame rate is greater than limit then wait
+    //        do {
+    //            g_Time.Hold();
+    //            glfwPollEvents();
+    //        } while (g_Time.DeltaTime() < m_FrameRateLimit);
+    //
+    //        // Update global systems
+    //        g_Time.Update();
+    //        g_Input.Update(g_Window);
+    //
+    //        // Managers
+    //        m_ObjectManager.ProcessFrame();
+    //        m_DrawManager.CallDraws();
+    //    }
 }
 
 void MyScene::RunOverNetwork() {
@@ -81,12 +81,14 @@ void MyScene::RunOverNetwork() {
     int released_counter = 60;
 
     // Game loop
-    while (m_Running && !glfwWindowShouldClose(g_Window)) {
+    while (m_Running) {
         // If frame rate is greater than limit then wait
         do {
+            //            std::cout << g_Time.DeltaTime() << std::endl;
             g_Time.Hold();
-            glfwPollEvents();
+            //            glfwPollEvents();
         } while (g_Time.DeltaTime() < m_FrameRateLimit);
+        //        std::cout << "going" << std::endl;
 
         while (enet_host_service(server, &event, 0) > 0) {
             switch (event.type) {
@@ -135,21 +137,22 @@ void MyScene::RunOverNetwork() {
                 just_released = false;
                 released_counter = 60;
             }
-        } 
-        
+        }
+
         if (just_gained) {
             gained_counter -= 1;
             if (gained_counter == 0) {
                 just_gained = false;
                 gained_counter = 60;
             }
-        } 
-        
+        }
+
         if (!just_gained && !just_released) {
             for (auto input_snapshot : input_snapshots_received_this_tick) {
                 bool control_matches_id = user_control.get_user_in_control() == input_snapshot.client_id;
                 bool attempting_to_toggle_control = input_snapshot.enter_pressed && input_snapshot.shift_pressed;
-                // std::cout << input_snapshot.enter_pressed << ' ' << input_snapshot.shift_pressed << std::endl;
+                //                std::cout << input_snapshot.enter_pressed << ' ' << input_snapshot.shift_pressed <<
+                //                std::endl;
                 if (!user_control.being_controlled) {
                     if (attempting_to_toggle_control) {
                         if (user_control.attempt_to_gain_control(input_snapshot.client_id)) {

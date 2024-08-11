@@ -1,16 +1,17 @@
 #include "Window.h"
 
-void Window::Initialize(unsigned int width, unsigned int height, const std::string& title) {
+void Window::Initialize(unsigned int width, unsigned int height, const std::string &title) {
     m_Width = width;
     m_Height = height;
     m_Title = title;
 
-    m_GLFWHandler = glfwCreateWindow(m_Width, m_Height, "Rubick's cube", nullptr, nullptr);
+    //    m_GLFWHandler = glfwCreateWindow(m_Width, m_Height, "Rubick's cube", nullptr, nullptr);
+    m_GLFWHandler = static_cast<GLFWwindow *>((void *)0);
 }
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    (void*)window;
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    (void *)window;
     g_Window.m_Width = width;
     g_Window.m_Height = height;
-    glViewport(0, 0, width, height);
+    //    glViewport(0, 0, width, height);
 }

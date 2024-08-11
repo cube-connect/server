@@ -4,8 +4,6 @@
 #include "scenes/MainScene.h"
 
 #pragma warning(push, 0)
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -21,31 +19,31 @@ Window g_Window;
 
 int main() {
     // Initialize OpenGL
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    
+    //    glfwInit();
+    //    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    //    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    //    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
     // Create window
     g_Window.Initialize(1920, 1080, "Rubik's cube");
-    if (!g_Window) {
-        glfwTerminate();
-        std::cout << "Failed to create GLFW window\n";
-        return EXIT_FAILURE;
-    }
-    glfwMakeContextCurrent(g_Window);
-    
-    // Load glad
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD\n";
-        return EXIT_FAILURE;
-    }
-    
-    // Set callbacks
-    glfwSetFramebufferSizeCallback(g_Window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(g_Window, mouse_callback);
-    glfwSetScrollCallback(g_Window, scroll_callback);
+    //    if (!g_Window) {
+    //        glfwTerminate();
+    //        std::cout << "Failed to create GLFW window\n";
+    //        return EXIT_FAILURE;
+    //    }
+    //    glfwMakeContextCurrent(g_Window);
+
+    //    // Load glad
+    //    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    //        std::cout << "Failed to initialize GLAD\n";
+    //        return EXIT_FAILURE;
+    //    }
+
+    //    // Set callbacks
+    //    glfwSetFramebufferSizeCallback(g_Window, framebuffer_size_callback);
+    //    glfwSetCursorPosCallback(g_Window, mouse_callback);
+    //    glfwSetScrollCallback(g_Window, scroll_callback);
 
     bool running_over_network = true;
 
@@ -58,12 +56,11 @@ int main() {
         main_scene.RunOverNetwork();
     } else {
         main_scene.Run();
-
     }
     main_scene.PostRun();
 
     // End of application
-    glfwSetWindowShouldClose(g_Window, true);
-    glfwTerminate();
+    //    glfwSetWindowShouldClose(g_Window, true);
+    //    glfwTerminate();
     return EXIT_SUCCESS;
 }

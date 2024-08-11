@@ -10,8 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MD")
 
 # Link libraries
-find_package(glfw3)
-find_package(glad)
+#find_package(glfw3)
+#find_package(glad)
 find_package(glm)
 find_package(assimp)
 find_package(stb)

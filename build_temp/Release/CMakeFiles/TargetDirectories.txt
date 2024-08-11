@@ -1,0 +1,5 @@
+/home/ccn/projects/cube-connect-organization/server/build/Release/CMakeFiles/edit_cache.dir
+/home/ccn/projects/cube-connect-organization/server/build/Release/CMakeFiles/rebuild_cache.dir
+/home/ccn/projects/cube-connect-organization/server/build/Release/src/CMakeFiles/cube_connect.dir
+/home/ccn/projects/cube-connect-organization/server/build/Release/src/CMakeFiles/edit_cache.dir
+/home/ccn/projects/cube-connect-organization/server/build/Release/src/CMakeFiles/rebuild_cache.dir
